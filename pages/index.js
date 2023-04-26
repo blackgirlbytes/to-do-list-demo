@@ -1,71 +1,70 @@
-import { useCallback, useEffect, useState } from 'react'
-import Button from '../components/Button'
-import ClickCount from '../components/ClickCount'
-import styles from '../styles/home.module.css'
+/* Create a To do list in Next.js 
 
-function throwError() {
-  console.log(
-    // The function body() is not defined
-    document.body()
-  )
-}
+- add items to do the list
+- delete items from the list
+*/
 
-function Home() {
-  const [count, setCount] = useState(0)
-  const increment = useCallback(() => {
-    setCount((v) => v + 1)
-  }, [setCount])
+import React, { useState } from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
+import { v4 as uuidv4 } from 'uuid';
 
-  useEffect(() => {
-    const r = setInterval(() => {
-      increment()
-    }, 1000)
+export default function Home() {
+ // create state for to do list with default items like: learn next.js, learn react.js, learn copilot
+  const [todoList, setTodoList] = useState([
+    { id: uuidv4(), name: 'Learn Next.js' },
+    { id: uuidv4(), name: 'Learn React.js' },
+    { id: uuidv4(), name: 'Learn Copilot' },
+  ]);
 
-    return () => {
-      clearInterval(r)
-    }
-  }, [increment])
+  // create state for to do items
+  const [todoItem, setTodoItem] = useState('');
 
+  // function that handles adding new items to list
+  const handleAddItem = () => {
+    // create new item object
+    const newItem = { id: uuidv4(), name: todoItem };
+    // update state with new item
+    setTodoList([...todoList, newItem]);
+    // reset input field
+    setTodoItem('');
+  }
+
+  // function that handles deleting items from list
+  const handleDeleteItem = (id) => {
+    // filter out item with id
+    const filteredList = todoList.filter((item) => item.id !== id);
+    // update state with new list
+    setTodoList(filteredList);
+  }
+
+  // render input field and button to add items and list of items
   return (
-    <main className={styles.main}>
-      <h1>Fast Refresh Demo</h1>
-      <p>
-        Fast Refresh is a Next.js feature that gives you instantaneous feedback
-        on edits made to your React components, without ever losing component
-        state.
-      </p>
-      <hr className={styles.hr} />
-      <div>
-        <p>
-          Auto incrementing value. The counter won't reset after edits or if
-          there are errors.
-        </p>
-        <p>Current value: {count}</p>
-      </div>
-      <hr className={styles.hr} />
-      <div>
-        <p>Component with state.</p>
-        <ClickCount />
-      </div>
-      <hr className={styles.hr} />
-      <div>
-        <p>
-          The button below will throw 2 errors. You'll see the error overlay to
-          let you know about the errors but it won't break the page or reset
-          your state.
-        </p>
-        <Button
-          onClick={(e) => {
-            setTimeout(() => document.parentNode(), 0)
-            throwError()
-          }}
-        >
-          Throw an Error
-        </Button>
-      </div>
-      <hr className={styles.hr} />
-    </main>
-  )
-}
+    <div className="container">
+      <Head>
+        <title>To Do List</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
-export default Home
+      <main>
+        <h1>To Do List</h1>
+        <input
+          type="text"
+          value={todoItem}
+          onChange={(e) => setTodoItem(e.target.value)}
+        />
+        <button onClick={handleAddItem}>Add Item</button>
+        <ul>
+          {todoList.map((item) => (
+            <li key={item.id}>
+              {item.name}
+              <button onClick={() => handleDeleteItem(item.id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+        </main>
+
+    </div>
+  );
+
+}
